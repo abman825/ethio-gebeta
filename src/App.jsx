@@ -7,7 +7,7 @@ function App() {
   const [scores, setScores] = useState([0, 0]);
   const [turn, setTurn] = useState(0); 
   const [gameMode, setGameMode] = useState(null); 
-  const [difficulty, setDifficulty] = useState('Easy'); // አዲስ፡ የደረጃ መቆጣጠሪያ
+  const [difficulty, setDifficulty] = useState('Easy');
   const [isAnimating, setIsAnimating] = useState(false);
   const [winner, setWinner] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
@@ -29,7 +29,6 @@ function App() {
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
   }, [gameMode]);
 
-  // የኮምፒውተር አጫዋች ዘዴ (AI Logic) -
   useEffect(() => {
     if (gameMode === 'PvE' && turn === 1 && !winner && !isAnimating) {
       setTimeout(() => {
@@ -38,22 +37,18 @@ function App() {
 
         let selectedMove;
         if (difficulty === 'Hard') {
-          // Hard: ነጥብ የሚያስገኝ ጉድጓድ ካለ እሱን ይመርጣል
           const scoringMove = validMoves.find(m => {
             let nextPos = (m + board[m]) % 12;
             return board[nextPos] + 1 === 4;
           });
           selectedMove = scoringMove || validMoves[Math.floor(Math.random() * validMoves.length)];
         } else if (difficulty === 'Medium') {
-          // Medium: 50/50 ዕድል
           selectedMove = Math.random() > 0.5 
             ? validMoves[Math.floor(Math.random() * validMoves.length)]
             : validMoves[validMoves.length - 1];
         } else {
-          // Easy: በዘፈቀደ
           selectedMove = validMoves[Math.floor(Math.random() * validMoves.length)];
         }
-        
         handleMove(selectedMove);
       }, 1200);
     }
@@ -104,10 +99,17 @@ function App() {
       newScores[0] += p1Total;
       newScores[1] += p2Total;
       setScores(newScores);
-      const msg = newScores[0] > newScores[1] 
-        ? `ተጫዋች 1 አሸነፈ! (${newScores[0]}-${newScores[1]})` 
-        : `ተጫዋች 2 አሸነፈ! (${newScores[1]}-${newScores[0]})`;
-      setWinner(msg);
+      
+      let finalMsg = "";
+      const scoreDetail = `(${newScores[0]} - ${newScores[1]})`;
+
+      if (gameMode === 'PvE') {
+        finalMsg = newScores[0] > newScores[1] ? `አሸንፈሃል! ${scoreDetail}` : `ተሸንፈሃል! ${scoreDetail}`;
+      } else {
+        finalMsg = newScores[0] > newScores[1] ? `ተጫዋች 1 አሸነፈ! ${scoreDetail}` : `ተጫዋች 2 አሸነፈ! ${scoreDetail}`;
+      }
+      if (newScores[0] === newScores[1]) finalMsg = `አቻ ተለያያችሁ! ${scoreDetail}`;
+      setWinner(finalMsg);
     } else {
       setTurn(turn === 0 ? 1 : 0);
     }
@@ -123,7 +125,7 @@ function App() {
         <div className="flex flex-col gap-4 w-full max-w-xs">
           <button onClick={() => selectMode('PvP')} className="bg-green-700 py-4 rounded-2xl font-bold shadow-lg">ከሰው ጋር</button>
           <div className="bg-blue-900/30 p-4 rounded-2xl border border-blue-500/30">
-            <p className="text-xs mb-2 text-blue-300 font-bold uppercase">የኮምፒውተር ደረጃ ይምረጡ</p>
+            <p className="text-xs mb-2 text-blue-300 font-bold uppercase text-center">የኮምፒውተር ደረጃ</p>
             <div className="flex gap-2 mb-3">
               {['Easy', 'Medium', 'Hard'].map(lvl => (
                 <button key={lvl} onClick={() => setDifficulty(lvl)} className={`flex-1 py-1 text-[10px] rounded-lg border ${difficulty === lvl ? 'bg-blue-600 border-white' : 'border-blue-500/50'}`}>{lvl}</button>
@@ -141,7 +143,6 @@ function App() {
                 <li>• የራስህ መስመር ላይ ያለን ጉድጓድ መርጠህ ትበትናለህ።</li>
                 <li>• በማንኛውም ጉድጓድ ውስጥ 4 ዘር ሲሞላ ይበላል።</li>
                 <li>• በአንድ በኩል ዘር ሲያልቅ ጨዋታው ያበቃል።</li>
-                <li>• በአጭሩ፣ ብዙ ዘር የበላ (score ያደረገ) ተጫዋች የጨዋታው አሸናፊ ነው ማለት ነው።</li>
               </ul>
               <button onClick={() => setShowHelp(false)} className="w-full mt-6 bg-white text-black py-3 rounded-xl font-bold">ተረዳሁ</button>
             </div>
@@ -187,9 +188,9 @@ function App() {
         </div>
         <div className="flex flex-col items-center">
           <div className="h-[50px] w-[320px] bg-white/5 border border-white/10 rounded-lg flex items-center justify-center overflow-hidden">
-            <ins className="adsbygoogle" style={{ display: 'inline-block', width: '320px', height: '50px' }} data-ad-client="ca-app-pub-8665668810095574" data-ad-slot="1112254381"></ins>
+            <ins className="adsbygoogle" style={{ display: 'inline-block', width: '320px', height: '50px' }} data-ad-client="ca-app-pub-8665668810095574" data-ad-slot="6394772167"></ins>
           </div>
-          <button onClick={() => window.location.reload()} className="text-[8px] text-gray-600 mt-1 uppercase tracking-widest">ዝጋና ውጣ</button>
+          <button onClick={() => window.location.reload()} className="text-[8px] text-gray-600 mt-1 uppercase tracking-widest hover:text-white">ዝጋና ውጣ</button>
         </div>
         <div className={`flex flex-col items-center p-2 rounded-xl border-2 w-20 sm:w-24 ${turn === 1 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
           <p className="text-[8px] text-gray-400 font-bold uppercase">P2 Score</p>
