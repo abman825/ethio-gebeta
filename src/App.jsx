@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+// ድምፅ እንዳይቋረጥ AudioContext እዚህ ጋር አንድ ጊዜ ብቻ ይፈጠራል
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 function App() {
   const [board, setBoard] = useState(Array(12).fill(4));
   const [scores, setScores] = useState([0, 0]);
@@ -8,23 +11,6 @@ function App() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [winner, setWinner] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
-
-  // ስክሪኑን ወደ ጎን (Landscape) ለመቆለፍ የሚረዳ Function
-  const lockOrientation = async () => {
-    try {
-      if (screen.orientation && screen.orientation.lock) {
-        await screen.orientation.lock('landscape');
-      }
-    } catch (error) {
-      console.log("Orientation lock is not supported on this browser.");
-    }
-  };
-
-  // ተጫዋቹ Mode ሲመርጥ ስክሪኑ እንዲዞር እንጠይቃለን
-  const selectMode = (mode) => {
-    setGameMode(mode);
-    lockOrientation(); // ስክሪኑን ለማዞር ይሞክራል
-  };
 
   // AdMob script
   useEffect(() => {
@@ -42,17 +28,18 @@ function App() {
         }
       }, 1200);
     }
-  }, [turn, gameMode, isAnimating]);
+  }, [turn, gameMode, isAnimating, winner, board]);
 
   const playPop = () => {
-    const context = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = context.createOscillator();
-    const gain = context.createGain();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(500, context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
-    osc.connect(gain); gain.connect(context.destination);
-    osc.start(); osc.stop(context.currentTime + 0.1);
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
   };
 
   const handleMove = async (index) => {
@@ -85,14 +72,23 @@ function App() {
     const p2Total = newBoard.slice(6, 12).reduce((a, b) => a + b, 0);
 
     if (p1Total === 0 || p2Total === 0) {
-      setWinner(newScores[0] > newScores[1] ? "ተጫዋች 1 አሸነፈ!" : "ተጫዋች 2 አሸነፈ!");
+      // ጨዋታው ሲያልቅ የቀሩትን ዘሮች መደመር
+      newScores[0] += p1Total;
+      newScores[1] += p2Total;
+      setScores(newScores);
+      
+      const msg = newScores[0] > newScores[1] 
+        ? `ተጫዋች 1 አሸነፈ! (${newScores[0]}-${newScores[1]})` 
+        : newScores[1] > newScores[0] 
+        ? `ተጫዋች 2 አሸነፈ! (${newScores[1]}-${newScores[0]})`
+        : `አቻ ተለያዩ! (${newScores[0]}-${newScores[1]})`;
+      setWinner(msg);
     } else {
       setTurn(turn === 0 ? 1 : 0);
     }
     setIsAnimating(false);
   };
 
-  // የHome Screen ገጽ
   if (!gameMode) {
     return (
       <div className="min-h-screen bg-[#121212] flex flex-col items-center justify-center text-white p-6">
@@ -102,8 +98,8 @@ function App() {
         </h1>
         
         <div className="flex flex-col gap-5 w-full max-w-xs">
-          <button onClick={() => selectMode('PvP')} className="bg-green-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-green-600 transition-all">ከሰው ጋር (2 Players)</button>
-          <button onClick={() => selectMode('PvE')} className="bg-blue-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-600 transition-all">ከኮምፒውተር ጋር (CPU)</button>
+          <button onClick={() => setGameMode('PvP')} className="bg-green-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-green-600 transition-all">ከሰው ጋር (2 Players)</button>
+          <button onClick={() => setGameMode('PvE')} className="bg-blue-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-600 transition-all">ከኮምፒውተር ጋር (CPU)</button>
           <button onClick={() => setShowHelp(true)} className="mt-4 text-gray-400 border border-gray-600 py-2 rounded-xl text-sm hover:bg-gray-800">የጨዋታው ህግ (Help)</button>
         </div>
 
@@ -126,20 +122,8 @@ function App() {
     );
   }
 
-  // የጨዋታው ዋና ገጽ
   return (
     <div className="min-h-screen bg-[#121212] flex flex-col items-center p-4 text-white">
-      {/* ለሞባይል ስክሪን ማስጠንቀቂያ - Landscape ካልሆነ ብቻ ይታያል */}
-      <style>{`
-        @media screen and (orientation: portrait) {
-          .portrait-warning { display: flex !important; }
-        }
-      `}</style>
-      <div className="portrait-warning hidden fixed inset-0 bg-black z-[100] flex-col items-center justify-center text-center p-10">
-        <div className="text-5xl mb-4">🔄</div>
-        <h2 className="text-xl font-bold">እባክዎ ለተሻለ አጫዋች ስልክዎን ወደ ጎን (Landscape) ያዙሩት</h2>
-      </div>
-
       <div className="flex justify-between w-full max-w-md my-6">
         <div className={`p-4 rounded-2xl border-2 transition-all ${turn === 0 ? 'border-yellow-400 bg-yellow-400/5' : 'border-white/5'}`}>
           <p className="text-[10px] uppercase text-gray-500">P1 SCORE</p>
@@ -172,7 +156,7 @@ function App() {
         </div>
       </div>
 
-      <button onClick={() => window.location.reload()} className="mt-8 text-xs text-gray-500 hover:text-white uppercase tracking-widest">ተመለስ</button>
+      <button onClick={() => window.location.reload()} className="mt-8 text-xs text-gray-500 hover:text-white uppercase tracking-widest">ዝጋና ውጣ</button>
 
       <div className="mt-auto mb-4 p-2 bg-white/5 border border-white/10 rounded-lg">
         <ins className="adsbygoogle"
@@ -182,8 +166,8 @@ function App() {
       </div>
 
       {winner && (
-        <div className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center z-50">
-          <h2 className="text-6xl font-black text-yellow-400 mb-8 animate-pulse text-center">{winner}</h2>
+        <div className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center z-50 p-6 text-center">
+          <h2 className="text-4xl sm:text-6xl font-black text-yellow-400 mb-8 animate-pulse">{winner}</h2>
           <button onClick={() => window.location.reload()} className="bg-white text-black px-12 py-4 rounded-full font-black text-xl shadow-2xl">ድጋሚ ጀምር</button>
         </div>
       )}
