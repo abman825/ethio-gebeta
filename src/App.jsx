@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// ድምፅ እንዳይቋረጥ AudioContext እዚህ ጋር አንድ ጊዜ ብቻ ይፈጠራል
+// ድምፅ እንዳይቋረጥ AudioContext አንድ ጊዜ ብቻ እዚህ ይፈጠራል
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function App() {
@@ -11,6 +11,22 @@ function App() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [winner, setWinner] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
+
+  // ስክሪኑን ወደ ጎን (Landscape) ለመቆለፍ
+  const lockOrientation = async () => {
+    try {
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape');
+      }
+    } catch (error) {
+      console.log("Orientation lock is not supported on this browser.");
+    }
+  };
+
+  const selectMode = (mode) => {
+    setGameMode(mode);
+    lockOrientation();
+  };
 
   // AdMob script
   useEffect(() => {
@@ -72,7 +88,6 @@ function App() {
     const p2Total = newBoard.slice(6, 12).reduce((a, b) => a + b, 0);
 
     if (p1Total === 0 || p2Total === 0) {
-      // ጨዋታው ሲያልቅ የቀሩትን ዘሮች መደመር
       newScores[0] += p1Total;
       newScores[1] += p2Total;
       setScores(newScores);
@@ -98,8 +113,8 @@ function App() {
         </h1>
         
         <div className="flex flex-col gap-5 w-full max-w-xs">
-          <button onClick={() => setGameMode('PvP')} className="bg-green-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-green-600 transition-all">ከሰው ጋር (2 Players)</button>
-          <button onClick={() => setGameMode('PvE')} className="bg-blue-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-600 transition-all">ከኮምፒውተር ጋር (CPU)</button>
+          <button onClick={() => selectMode('PvP')} className="bg-green-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-green-600 transition-all">ከሰው ጋር (2 Players)</button>
+          <button onClick={() => selectMode('PvE')} className="bg-blue-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-600 transition-all">ከኮምፒውተር ጋር (CPU)</button>
           <button onClick={() => setShowHelp(true)} className="mt-4 text-gray-400 border border-gray-600 py-2 rounded-xl text-sm hover:bg-gray-800">የጨዋታው ህግ (Help)</button>
         </div>
 
@@ -123,46 +138,61 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#121212] flex flex-col items-center p-4 text-white">
-      <div className="flex justify-between w-full max-w-md my-6">
-        <div className={`p-4 rounded-2xl border-2 transition-all ${turn === 0 ? 'border-yellow-400 bg-yellow-400/5' : 'border-white/5'}`}>
+    <div className="min-h-screen bg-[#121212] flex flex-col items-center justify-center p-4 text-white overflow-hidden">
+      <style>{`
+        @media screen and (orientation: portrait) {
+          .portrait-warning { display: flex !important; }
+        }
+      `}</style>
+      <div className="portrait-warning hidden fixed inset-0 bg-black z-[100] flex-col items-center justify-center text-center p-10">
+        <div className="text-5xl mb-4">🔄</div>
+        <h2 className="text-xl font-bold">እባክዎ ለተሻለ አጫዋች ስልክዎን ወደ ጎን (Landscape) ያዙሩት</h2>
+      </div>
+
+      <div className="flex flex-row items-center justify-center gap-8 w-full max-w-5xl px-4">
+        {/* P1 Score - በግራ በኩል */}
+        <div className={`p-4 rounded-2xl border-2 transition-all min-w-[100px] text-center ${turn === 0 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
           <p className="text-[10px] uppercase text-gray-500">P1 SCORE</p>
-          <h2 className="text-3xl font-black">{scores[0]}</h2>
+          <h2 className="text-4xl font-black">{scores[0]}</h2>
         </div>
-        <div className={`p-4 rounded-2xl border-2 transition-all ${turn === 1 ? 'border-yellow-400 bg-yellow-400/5' : 'border-white/5'}`}>
+
+        {/* የገበጣ ቦርድ - መሃል ላይ */}
+        <div className="bg-[#5d4037] p-6 rounded-[3rem] border-[12px] border-[#3e2723] shadow-2xl scale-90 sm:scale-100">
+          <div className="grid gap-6">
+            <div className="flex gap-4">
+              {board.slice(6, 12).reverse().map((s, i) => (
+                <div key={11-i} onClick={() => handleMove(11-i)} className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-2 relative shadow-inner cursor-pointer">
+                  {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-2 h-2 bg-gray-200 rounded-full m-0.5"></div>)}
+                  <span className="absolute -top-2 bg-red-600 text-[10px] px-1.5 rounded-full">{s}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-4">
+              {board.slice(0, 6).map((s, i) => (
+                <div key={i} onClick={() => handleMove(i)} className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-2 relative shadow-inner cursor-pointer">
+                  {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-2 h-2 bg-gray-200 rounded-full m-0.5"></div>)}
+                  <span className="absolute -bottom-2 bg-green-600 text-[10px] px-1.5 rounded-full">{s}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* P2 Score - በቀኝ በኩል */}
+        <div className={`p-4 rounded-2xl border-2 transition-all min-w-[100px] text-center ${turn === 1 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
           <p className="text-[10px] uppercase text-gray-500">P2 SCORE</p>
-          <h2 className="text-3xl font-black">{scores[1]}</h2>
+          <h2 className="text-4xl font-black">{scores[1]}</h2>
         </div>
       </div>
 
-      <div className="bg-[#5d4037] p-6 rounded-[3rem] border-[12px] border-[#3e2723] shadow-2xl scale-90 sm:scale-100">
-        <div className="grid gap-6">
-          <div className="flex gap-4">
-            {board.slice(6, 12).reverse().map((s, i) => (
-              <div key={11-i} onClick={() => handleMove(11-i)} className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-2 relative shadow-inner cursor-pointer">
-                {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-2 h-2 bg-gray-200 rounded-full m-0.5"></div>)}
-                <span className="absolute -top-2 bg-red-600 text-[10px] px-1.5 rounded-full">{s}</span>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-4">
-            {board.slice(0, 6).map((s, i) => (
-              <div key={i} onClick={() => handleMove(i)} className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-2 relative shadow-inner cursor-pointer">
-                {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-2 h-2 bg-gray-200 rounded-full m-0.5"></div>)}
-                <span className="absolute -bottom-2 bg-green-600 text-[10px] px-1.5 rounded-full">{s}</span>
-              </div>
-            ))}
-          </div>
+      <div className="flex flex-col items-center gap-2 mt-4">
+        <button onClick={() => window.location.reload()} className="text-[10px] text-gray-500 hover:text-white uppercase tracking-widest">ዝጋና ውጣ</button>
+        <div className="p-1 bg-white/5 border border-white/10 rounded-lg">
+          <ins className="adsbygoogle"
+               style={{ display: 'block', width: '320px', height: '50px' }}
+               data-ad-client="ca-app-pub-8665668810095574"
+               data-ad-slot="1112254381"></ins>
         </div>
-      </div>
-
-      <button onClick={() => window.location.reload()} className="mt-8 text-xs text-gray-500 hover:text-white uppercase tracking-widest">ዝጋና ውጣ</button>
-
-      <div className="mt-auto mb-4 p-2 bg-white/5 border border-white/10 rounded-lg">
-        <ins className="adsbygoogle"
-             style={{ display: 'block', width: '320px', height: '50px' }}
-             data-ad-client="ca-app-pub-8665668810095574"
-             data-ad-slot="1112254381"></ins>
       </div>
 
       {winner && (
