@@ -9,6 +9,23 @@ function App() {
   const [winner, setWinner] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
 
+  // ስክሪኑን ወደ ጎን (Landscape) ለመቆለፍ የሚረዳ Function
+  const lockOrientation = async () => {
+    try {
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape');
+      }
+    } catch (error) {
+      console.log("Orientation lock is not supported on this browser.");
+    }
+  };
+
+  // ተጫዋቹ Mode ሲመርጥ ስክሪኑ እንዲዞር እንጠይቃለን
+  const selectMode = (mode) => {
+    setGameMode(mode);
+    lockOrientation(); // ስክሪኑን ለማዞር ይሞክራል
+  };
+
   // AdMob script
   useEffect(() => {
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
@@ -75,7 +92,7 @@ function App() {
     setIsAnimating(false);
   };
 
-  // መጀመሪያ የሚመጣው ገጽ (Home Screen)
+  // የHome Screen ገጽ
   if (!gameMode) {
     return (
       <div className="min-h-screen bg-[#121212] flex flex-col items-center justify-center text-white p-6">
@@ -85,10 +102,8 @@ function App() {
         </h1>
         
         <div className="flex flex-col gap-5 w-full max-w-xs">
-          <button onClick={() => setGameMode('PvP')} className="bg-green-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-green-600 transition-all">ከሰው ጋር (2 Players)</button>
-          <button onClick={() => setGameMode('PvE')} className="bg-blue-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-600 transition-all">ከኮምፒውተር ጋር (CPU)</button>
-          
-          {/* የHelp በተን እዚህ ገብቷል */}
+          <button onClick={() => selectMode('PvP')} className="bg-green-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-green-600 transition-all">ከሰው ጋር (2 Players)</button>
+          <button onClick={() => selectMode('PvE')} className="bg-blue-700 py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-600 transition-all">ከኮምፒውተር ጋር (CPU)</button>
           <button onClick={() => setShowHelp(true)} className="mt-4 text-gray-400 border border-gray-600 py-2 rounded-xl text-sm hover:bg-gray-800">የጨዋታው ህግ (Help)</button>
         </div>
 
@@ -101,10 +116,7 @@ function App() {
                 <li>• በማንኛውም ጉድጓድ ውስጥ 4 ዘር ሲሞላ ወዲያውኑ ይበላል (ውጤት ይሆናል)።</li>
                 <li>• የበላኸው ጉድጓድ ባዶ ይሆናል።</li>
                 <li>• በአንድ በኩል ዘር ሲያልቅ ጨዋታው ያበቃል።</li>
-                <li>•በመጫወት ሂደት የበላኸው ውጤት (Score) ተደምሮ፣
-
-ሲያልቅ ደግሞ ያንተ መስመር ላይ የቀሩት ዘሮች ተደምረው፣
-ትልቁን ድምር ያገኘ ተጫዋች አሸናፊ ይሆናል።</li>
+                <li>• ውጤትህ ተደምሮ ከፍተኛ ነጥብ ያለው ያሸንፋል።</li>
               </ul>
               <button onClick={() => setShowHelp(false)} className="w-full mt-6 bg-white text-black py-3 rounded-xl font-bold">ተረዳሁ</button>
             </div>
@@ -114,9 +126,20 @@ function App() {
     );
   }
 
-  // የጨዋታው ገጽ
+  // የጨዋታው ዋና ገጽ
   return (
     <div className="min-h-screen bg-[#121212] flex flex-col items-center p-4 text-white">
+      {/* ለሞባይል ስክሪን ማስጠንቀቂያ - Landscape ካልሆነ ብቻ ይታያል */}
+      <style>{`
+        @media screen and (orientation: portrait) {
+          .portrait-warning { display: flex !important; }
+        }
+      `}</style>
+      <div className="portrait-warning hidden fixed inset-0 bg-black z-[100] flex-col items-center justify-center text-center p-10">
+        <div className="text-5xl mb-4">🔄</div>
+        <h2 className="text-xl font-bold">እባክዎ ለተሻለ አጫዋች ስልክዎን ወደ ጎን (Landscape) ያዙሩት</h2>
+      </div>
+
       <div className="flex justify-between w-full max-w-md my-6">
         <div className={`p-4 rounded-2xl border-2 transition-all ${turn === 0 ? 'border-yellow-400 bg-yellow-400/5' : 'border-white/5'}`}>
           <p className="text-[10px] uppercase text-gray-500">P1 SCORE</p>
@@ -132,7 +155,7 @@ function App() {
         <div className="grid gap-6">
           <div className="flex gap-4">
             {board.slice(6, 12).reverse().map((s, i) => (
-              <div key={11-i} onClick={() => handleMove(11-i)} className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-2 relative shadow-inner">
+              <div key={11-i} onClick={() => handleMove(11-i)} className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-2 relative shadow-inner cursor-pointer">
                 {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-2 h-2 bg-gray-200 rounded-full m-0.5"></div>)}
                 <span className="absolute -top-2 bg-red-600 text-[10px] px-1.5 rounded-full">{s}</span>
               </div>
@@ -140,7 +163,7 @@ function App() {
           </div>
           <div className="flex gap-4">
             {board.slice(0, 6).map((s, i) => (
-              <div key={i} onClick={() => handleMove(i)} className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-2 relative shadow-inner">
+              <div key={i} onClick={() => handleMove(i)} className="w-16 h-16 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-2 relative shadow-inner cursor-pointer">
                 {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-2 h-2 bg-gray-200 rounded-full m-0.5"></div>)}
                 <span className="absolute -bottom-2 bg-green-600 text-[10px] px-1.5 rounded-full">{s}</span>
               </div>
@@ -149,9 +172,8 @@ function App() {
         </div>
       </div>
 
-      <button onClick={() => window.location.reload()} className="mt-8 text-xs text-gray-500 hover:text-white uppercase tracking-widest">ዘግተህ ውጣ</button>
+      <button onClick={() => window.location.reload()} className="mt-8 text-xs text-gray-500 hover:text-white uppercase tracking-widest">ተመለስ</button>
 
-      {/* AdMob ማስታወቂያ ቦታ ተስተካክሏል */}
       <div className="mt-auto mb-4 p-2 bg-white/5 border border-white/10 rounded-lg">
         <ins className="adsbygoogle"
              style={{ display: 'block', width: '320px', height: '50px' }}
