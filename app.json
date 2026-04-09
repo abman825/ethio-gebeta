@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Ethio-Gebeta",
+    "android": {
+      "package": "com.abrham.ethiogebeta"
+    },
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8665668810095574~4341052953"
+        }
+      ]
+    ]
+  }
+}
