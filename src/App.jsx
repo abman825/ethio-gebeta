@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
 const API_URL = "https://ethio-gebeta-backend.onrender.com";
-
 const socket = io(API_URL, { autoConnect: false });
+
 function App() {
   const [board, setBoard] = useState(Array(12).fill(4));
   const [scores, setScores] = useState([0, 0]);
@@ -22,7 +22,9 @@ function App() {
 
   // AdMob script
   useEffect(() => {
-    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+    try { 
+      (window.adsbygoogle = window.adsbygoogle || []).push({}); 
+    } catch (e) {}
   }, [gameMode]);
 
   // CPU Move Logic (PvE Mode)
@@ -83,9 +85,13 @@ function App() {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(500, context.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
-      osc.connect(gain); gain.connect(context.destination);
-      osc.start(); osc.stop(context.currentTime + 0.1);
-    } catch (e) { console.log("Audio play failed"); }
+      osc.connect(gain); 
+      gain.connect(context.destination);
+      osc.start(); 
+      osc.stop(context.currentTime + 0.1);
+    } catch (e) { 
+      console.log("Audio play failed"); 
+    }
   };
 
   const handleMove = async (index) => {
@@ -177,28 +183,24 @@ function App() {
         
         <div className="flex flex-col gap-4 w-full max-w-xs z-10">
           <button 
-            onTouchEnd={(e) => { e.preventDefault(); setGameMode('PvP'); }}
             onClick={() => setGameMode('PvP')} 
             className="active:scale-95 bg-green-700 py-4 rounded-2xl font-bold shadow-lg transition-all touch-manipulation">
-            ከሰው ጋር (Local 2 Players)
+            ከሰዉ ጋር (Local 2 Players)
           </button>
           
           <button 
-            onTouchEnd={(e) => { e.preventDefault(); setGameMode('PvE'); }}
             onClick={() => setGameMode('PvE')} 
             className="active:scale-95 bg-blue-700 py-4 rounded-2xl font-bold shadow-lg transition-all touch-manipulation">
             ከኮምፒውተር ጋር (CPU)
           </button>
 
           <button 
-            onTouchEnd={(e) => { e.preventDefault(); setGameMode('Online'); }}
             onClick={() => setGameMode('Online')} 
             className="active:scale-95 bg-purple-700 py-4 rounded-2xl font-bold shadow-lg transition-all touch-manipulation">
             በኢንተርኔት (Online Room)
           </button>
           
           <button 
-            onTouchEnd={(e) => { e.preventDefault(); setShowHelp(true); }}
             onClick={() => setShowHelp(true)} 
             className="mt-2 text-gray-400 border border-gray-600 py-2 rounded-xl text-sm touch-manipulation">
             የጨዋታው ህግ (Help)
@@ -215,7 +217,6 @@ function App() {
                 <li>• በአንድ በኩል ጠጠር ሲያልቅ ጨዋታው ያበቃል።</li>
               </ul>
               <button 
-                onTouchEnd={() => setShowHelp(false)}
                 onClick={() => setShowHelp(false)} 
                 className="w-full mt-6 bg-white text-black py-3 rounded-xl font-bold">ተረዳሁ</button>
             </div>
@@ -231,11 +232,11 @@ function App() {
         <h2 className="text-3xl font-bold text-purple-400 mb-6">ኦንላይን ገበጣ</h2>
         
         <div className="bg-neutral-800 p-6 rounded-3xl border border-neutral-700 flex flex-col items-center gap-4 w-full max-w-xs">
-          <p className="text-sm text-gray-300 text-center">የክፍል ኮድ (Room Code) ያስገቡ ወይም ይፍጠሩ፡</p>
+          <p className="text-sm text-gray-300 text-center">የክፍል ኮድ (Room Code) ያስገቡ ወይም ይፍጠሩ፦</p>
           
           <input 
             type="text" 
-            placeholder="ምሳሌ፡ 1234" 
+            placeholder="ምሳሌ፦ 1234" 
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
             className="w-full p-3 rounded-xl bg-neutral-900 border border-neutral-600 text-center text-xl font-bold uppercase text-white"
@@ -264,8 +265,8 @@ function App() {
       
       {gameMode === 'Online' && (
         <div className="bg-purple-900/50 border border-purple-500/30 px-4 py-2 rounded-xl text-center text-sm font-semibold mb-2">
-          ክፍል፡ <span className="text-yellow-400 font-bold">{joinedRoom}</span> | 
-          እርስዎ፡ <span className="text-green-400">{myPlayerIndex === 0 ? 'P1' : 'P2'}</span>
+          ክፍል፦ <span className="text-yellow-400 font-bold">{joinedRoom}</span> | 
+          እርሶ፦ <span className="text-green-400">{myPlayerIndex === 0 ? 'P1' : 'P2'}</span>
           <p className="text-xs text-purple-300 mt-1 animate-pulse">{onlineStatus}</p>
         </div>
       )}
@@ -273,14 +274,14 @@ function App() {
       <div className="flex justify-between w-full max-w-md my-4">
         <div className={`p-4 rounded-2xl border-2 transition-all ${turn === 0 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
           <p className="text-[10px] uppercase text-gray-500">
-            {gameMode === 'Online' ? (myPlayerIndex === 0 ? 'P1 (እርስዎ)' : 'P1 (ተቃዋሚ)') : 'P1 SCORE'}
+            {gameMode === 'Online' ? (myPlayerIndex === 0 ? 'P1 (እርሶ)' : 'P1 (ተቃዋሚ)') : 'P1 SCORE'}
           </p>
           <h2 className="text-3xl font-black">{scores[0]}</h2>
         </div>
         
         <div className={`p-4 rounded-2xl border-2 transition-all ${turn === 1 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
           <p className="text-[10px] uppercase text-gray-500">
-            {gameMode === 'Online' ? (myPlayerIndex === 1 ? 'P2 (እርስዎ)' : 'P2 (ተቃዋሚ)') : (gameMode === 'PvE' ? 'P2 (CPU)' : 'P2 SCORE')}
+            {gameMode === 'Online' ? (myPlayerIndex === 1 ? 'P2 (እርሶ)' : 'P2 (ተቃዋሚ)') : (gameMode === 'PvE' ? 'P2 (CPU)' : 'P2 SCORE')}
           </p>
           <h2 className="text-3xl font-black">{scores[1]}</h2>
         </div>
@@ -293,7 +294,6 @@ function App() {
             {board.slice(6, 12).reverse().map((s, i) => (
               <div 
                 key={11-i} 
-                onTouchEnd={(e) => { e.preventDefault(); handleMove(11-i); }}
                 onClick={() => handleMove(11-i)} 
                 className="w-14 h-14 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-1 relative shadow-inner touch-manipulation cursor-pointer">
                 {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-1.5 h-1.5 bg-gray-200 rounded-full m-0.5"></div>)}
@@ -306,7 +306,6 @@ function App() {
             {board.slice(0, 6).map((s, i) => (
               <div 
                 key={i} 
-                onTouchEnd={(e) => { e.preventDefault(); handleMove(i); }}
                 onClick={() => handleMove(i)} 
                 className="w-14 h-14 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-1 relative shadow-inner touch-manipulation cursor-pointer">
                 {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-1.5 h-1.5 bg-gray-200 rounded-full m-0.5"></div>)}
@@ -321,15 +320,8 @@ function App() {
       <button 
         onClick={() => window.location.reload()} 
         className="mt-6 text-xs text-gray-500 hover:text-white uppercase tracking-widest p-4">
-        ወጣቱህ ውጣ
+        ውጣ / አዲስ ጀምር
       </button>
-
-      <div className="mt-auto mb-2 z-0">
-        <ins className="adsbygoogle"
-             style={{ display: 'inline-block', width: '320px', height: '50px' }}
-             data-ad-client="ca-app-pub-8665668810095574"
-             data-ad-slot="1112254381"></ins>
-      </div>
 
       {winner && (
         <div className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center z-[100] p-4 text-center">
