@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
-const SOCKET_URL = "https://ethio-gebeta-backend.onrender.com";
+const API_BASE_URL = "https://ethio-gebeta-backend.onrender.com";;
 const socket = io(SOCKET_URL, { autoConnect: false });
 
 function App() {
