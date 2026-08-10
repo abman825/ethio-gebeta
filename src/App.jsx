@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
 const API_URL = "https://ethio-gebeta-backend.onrender.com";
-const socket = io(SOCKET_URL, { autoConnect: false });
 
+const socket = io(API_URL, { autoConnect: false });
 function App() {
   const [board, setBoard] = useState(Array(12).fill(4));
   const [scores, setScores] = useState([0, 0]);
