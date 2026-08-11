@@ -23,7 +23,8 @@ export default function AdBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="z-50 my-6 flex flex-col items-center w-full max-w-4xl bg-neutral-900/90 p-3 rounded-2xl border border-neutral-700/60 shadow-2xl">
+    // touch-auto እና overflow-x-auto በስልክ ላይ Scroll እንዲያደርግ ይረዱታል
+    <div className="z-40 my-6 flex flex-col items-center w-full max-w-4xl bg-neutral-900/90 p-3 rounded-2xl border border-neutral-700/60 shadow-2xl touch-auto">
       
       {/* የደብቅ በተን */}
       <div className="w-full flex justify-end mb-2">
@@ -35,8 +36,11 @@ export default function AdBanner() {
         </button>
       </div>
 
-      {/* የማስታወቂያው ቦታ */}
-      <div ref={adRef} className="w-full flex justify-center overflow-hidden rounded-xl min-h-[90px]" />
+      {/* የማስታወቂያው ቦታ - touch-auto ገጹን Scroll ለማድረግ ይረዳል */}
+      <div 
+        ref={adRef} 
+        className="w-full flex justify-center min-h-[90px] overflow-x-auto touch-auto" 
+      />
     </div>
   );
 }
