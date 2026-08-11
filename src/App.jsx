@@ -355,7 +355,7 @@ function App() {
 
   // ዋናው የመጫወቻ ገጽ
   return (
-    <div className="min-h-screen bg-[#121212] flex flex-col items-center p-4 text-white overflow-hidden touch-none">
+    <div className="min-h-screen bg-[#121212] flex flex-col items-center p-4 text-white overflow-hidden touch-pan-y">
       
       {gameMode === 'Online' && (
         <div className="bg-purple-900/50 border border-purple-500/30 px-4 py-2 rounded-xl text-center text-sm font-semibold mb-2">
@@ -364,7 +364,7 @@ function App() {
           <p className="text-xs text-purple-300 mt-1 animate-pulse">{onlineStatus}</p>
         </div>
       )}
-
+<div className="min-h-screen w-full bg-[#121212] overflow-y-auto touch-pan-y flex flex-col items-center justify-between p-4"></div>
       <div className="flex justify-between w-full max-w-md my-4">
         <div className={`p-4 rounded-2xl border-2 transition-all ${turn === 0 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
           <p className="text-[10px] uppercase text-gray-500">

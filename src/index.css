@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 📱 በስልክ ላይ Scroll እንዳይዘጋ የሚያስተካክል ኮድ */
+html, body {
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y !important;
+}
+
+#root {
+  min-height: 100vh;
+  overflow-y: auto;
+}
