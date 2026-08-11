@@ -352,37 +352,38 @@ function App() {
       </div>
     );
   }
-
-  // ዋናው የመጫወቻ ገጽ
+// ዋናው የመጫወቻ ገጽ
   return (
-    <div className="min-h-screen bg-[#121212] flex flex-col items-center p-4 text-white overflow-hidden touch-pan-y">
+    <div className="min-h-screen w-full bg-[#121212] flex flex-col items-center justify-start pt-2 pb-8 px-4 text-white overflow-y-auto touch-pan-y">
       
       {gameMode === 'Online' && (
-        <div className="bg-purple-900/50 border border-purple-500/30 px-4 py-2 rounded-xl text-center text-sm font-semibold mb-2">
+        <div className="bg-purple-900/50 border border-purple-500/30 px-4 py-2 rounded-xl text-center text-sm font-semibold my-2 w-full max-w-md">
           ክፍልዎ <span className="text-yellow-400 font-bold">{joinedRoom}</span> | 
           እርስዎ <span className="text-green-400">{myPlayerIndex === 0 ? 'P1' : 'P2'}</span>
           <p className="text-xs text-purple-300 mt-1 animate-pulse">{onlineStatus}</p>
         </div>
       )}
-<div className="min-h-screen w-full bg-[#121212] overflow-y-auto touch-pan-y flex flex-col items-center justify-between p-4"></div>
-      <div className="flex justify-between w-full max-w-md my-4">
-        <div className={`p-4 rounded-2xl border-2 transition-all ${turn === 0 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
+
+      {/* የነጥብ ማሳያ ሰሌዳዎች */}
+      <div className="flex justify-between w-full max-w-md my-2">
+        <div className={`p-3 sm:p-4 rounded-2xl border-2 transition-all ${turn === 0 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
           <p className="text-[10px] uppercase text-gray-500">
-            {gameMode === 'Online' ? (myPlayerIndex === 0 ? 'P1 (እርሶ)' : 'P1 (ተቃዋሚ)') : 'P1 SCORE'}
+            {gameMode === 'Online' ? (myPlayerIndex === 0 ? 'P1 (እርስዎ)' : 'P1 (ተቃዋሚ)') : 'P1 SCORE'}
           </p>
-          <h2 className="text-3xl font-black">{scores[0]}</h2>
+          <h2 className="text-2xl sm:text-3xl font-black">{scores[0]}</h2>
         </div>
         
-        <div className={`p-4 rounded-2xl border-2 transition-all ${turn === 1 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
+        <div className={`p-3 sm:p-4 rounded-2xl border-2 transition-all ${turn === 1 ? 'border-yellow-400 bg-yellow-400/10' : 'border-white/5'}`}>
           <p className="text-[10px] uppercase text-gray-500">
-            {gameMode === 'Online' ? (myPlayerIndex === 1 ? 'P2 (እርሶ)' : 'P2 (ተቃዋሚ)') : (gameMode === 'PvE' ? `P2 (CPU - ${difficulty})` : 'P2 SCORE')}
+            {gameMode === 'Online' ? (myPlayerIndex === 1 ? 'P2 (እርስዎ)' : 'P2 (ተቃዋሚ)') : (gameMode === 'PvE' ? `P2 (CPU - ${difficulty})` : 'P2 SCORE')}
           </p>
-          <h2 className="text-3xl font-black">{scores[1]}</h2>
+          <h2 className="text-2xl sm:text-3xl font-black">{scores[1]}</h2>
         </div>
       </div>
 
-      <div className="bg-[#5d4037] p-4 rounded-[2.5rem] border-[10px] border-[#3e2723] shadow-2xl scale-95 sm:scale-100">
-        <div className="grid gap-4">
+      {/* የገበጣ ቦርድ */}
+      <div className="bg-[#5d4037] p-3 sm:p-4 rounded-[2.5rem] border-[8px] sm:border-[10px] border-[#3e2723] shadow-2xl scale-95 sm:scale-100 my-2">
+        <div className="grid gap-3 sm:gap-4">
           
           {/* የላይኛው መስመር (የተጫዋች 2 / CPU ጉድጓዶች 6-11) */}
           <div className="flex gap-2 sm:gap-4">
@@ -390,7 +391,7 @@ function App() {
               <div 
                 key={11-i} 
                 onClick={() => handleMove(11-i)} 
-                className="w-14 h-14 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-1 relative shadow-inner touch-manipulation cursor-pointer">
+                className="w-12 h-12 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-1 relative shadow-inner touch-manipulation cursor-pointer">
                 {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-1.5 h-1.5 bg-gray-200 rounded-full m-0.5"></div>)}
                 <span className="absolute -top-2 bg-red-600 text-[9px] px-1.5 rounded-full font-bold">{s}</span>
               </div>
@@ -403,7 +404,7 @@ function App() {
               <div 
                 key={i} 
                 onClick={() => handleMove(i)} 
-                className="w-14 h-14 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-1 relative shadow-inner touch-manipulation cursor-pointer">
+                className="w-12 h-12 sm:w-20 sm:h-20 bg-[#2b1b17] rounded-full flex flex-wrap justify-center items-center p-1 relative shadow-inner touch-manipulation cursor-pointer">
                 {Array(s).fill(0).map((_, idx) => <div key={idx} className="w-1.5 h-1.5 bg-gray-200 rounded-full m-0.5"></div>)}
                 <span className="absolute -bottom-2 bg-green-600 text-[9px] px-1.5 rounded-full font-bold">{s}</span>
               </div>
@@ -413,13 +414,14 @@ function App() {
         </div>
       </div>
 
-
       <button 
         onClick={() => window.location.reload()} 
-        className="mt-6 text-xs text-gray-500 hover:text-white uppercase tracking-widest p-4">
+        className="mt-2 text-xs text-gray-500 hover:text-white uppercase tracking-widest p-2">
         ወጣ / አዲስ ጀምር
       </button>
-      <AdBanner/>
+
+      {/* የማስታወቂያ ቦታ */}
+      <AdBanner />
 
       {/* የውጤት ማሳወቂያ Modal */}
       {winner && (
@@ -431,7 +433,7 @@ function App() {
           <button 
             onClick={() => window.location.reload()} 
             className="bg-green-600 hover:bg-green-500 text-white px-10 py-4 rounded-full font-black text-xl shadow-2xl active:scale-90 transition-transform">
-            ድጋሚ ጀምር
+            ደጋሚ ጀምር
           </button>
         </div>
       )}
