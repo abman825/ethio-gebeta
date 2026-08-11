@@ -354,7 +354,7 @@ function App() {
   }
 // ዋናው የመጫወቻ ገጽ
   return (
-    <div className="min-h-screen w-full bg-[#121212] flex flex-col items-center justify-start pt-2 pb-8 px-4 text-white overflow-y-auto touch-pan-y">
+    <div className="min-h-screen h-auto w-full bg-[#121212] flex flex-col items-center justify-start pt-2 pb-8 px-4 text-white overflow-y-auto touch-pan-y grow">
       
       {gameMode === 'Online' && (
         <div className="bg-purple-900/50 border border-purple-500/30 px-4 py-2 rounded-xl text-center text-sm font-semibold my-2 w-full max-w-md">
